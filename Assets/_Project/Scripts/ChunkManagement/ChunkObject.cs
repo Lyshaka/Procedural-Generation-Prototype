@@ -24,6 +24,7 @@ public class ChunkObject : MonoBehaviour
 	readonly GroundTile[] tiles = new GroundTile[ChunkManager.CHUNK_SIZE * ChunkManager.CHUNK_SIZE];
 	readonly Vector3Int[] tilesPositions = new Vector3Int[ChunkManager.CHUNK_SIZE * ChunkManager.CHUNK_SIZE];
 	public readonly bool[] tilesWalkable = new bool[ChunkManager.CHUNK_SIZE * ChunkManager.CHUNK_SIZE];
+	public readonly int[] tilesPenalty = new int[ChunkManager.CHUNK_SIZE * ChunkManager.CHUNK_SIZE];
 
 	private void FixedUpdate()
 	{
@@ -58,11 +59,12 @@ public class ChunkObject : MonoBehaviour
 		GroundTile groundTile = ChunkManager.Instance.groundTile;
 		GroundTile voidTile = ChunkManager.Instance.voidTile;
 
-		GroundTile[] pathTiles = new GroundTile[4];
+		GroundTile[] pathTiles = new GroundTile[5];
 		pathTiles[0] = ChunkManager.Instance.pathTile0;
 		pathTiles[1] = ChunkManager.Instance.pathTile1;
 		pathTiles[2] = ChunkManager.Instance.pathTile2;
 		pathTiles[3] = ChunkManager.Instance.pathTile3;
+		pathTiles[4] = ChunkManager.Instance.pathTile4;
 
 
 		_position = position;
@@ -89,7 +91,7 @@ public class ChunkObject : MonoBehaviour
 				if (t > 0.4f && t <= 0.65f)
 				{
 					tilesValues[y * chunkSize + x] = 2;
-					tiles[y * chunkSize + x] = Random.value < 0.8f ? groundTile : pathTiles[Random.Range(0, 4)];
+					tiles[y * chunkSize + x] = pathTiles[Random.Range(0, 4)];
 				}
 				if (t > 0.48f && t <= 0.56f)
 				{
@@ -99,6 +101,7 @@ public class ChunkObject : MonoBehaviour
 
 				tilesPositions[y * chunkSize + x] = new Vector3Int(_worldPosition.x + x, _worldPosition.y + y);
 				tilesWalkable[y * chunkSize + x] = tiles[y * chunkSize + x].walkable;
+				tilesPenalty[y * chunkSize + x] = tiles[y * chunkSize + x].penalty;
 			}
 		}
 

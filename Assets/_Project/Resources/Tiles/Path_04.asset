@@ -10,11 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6b982867682d5a04f8508e5c8b90bfc6, type: 3}
-  m_Name: Path_03
+  m_Name: Path_04
   m_EditorClassIdentifier: 
-  m_DefaultSprite: {fileID: 319932049, guid: a8b1bb10f2a72554ca8e64628ddb3c7b, type: 3}
+  m_DefaultSprite: {fileID: 1523761419, guid: a8b1bb10f2a72554ca8e64628ddb3c7b, type: 3}
   m_DefaultGameObject: {fileID: 0}
   m_DefaultColliderType: 0
   m_TilingRules: []
   walkable: 1
-  penalty: 200
+  penalty: 100

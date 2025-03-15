@@ -31,7 +31,7 @@ public class ChunkManager : MonoBehaviour
 
 	bool _debugMode;
 
-	public Vector2Int PlayerChunkPosition => PosToChunk(Player.Instance.transform.position);
+	public Vector2Int PlayerChunkPosition => Utilities.PosToChunk(Player.Instance.transform.position);
 
 
 	public int Size => size;
@@ -44,6 +44,7 @@ public class ChunkManager : MonoBehaviour
 	public GroundTile pathTile1;
 	public GroundTile pathTile2;
 	public GroundTile pathTile3;
+	public GroundTile pathTile4;
 	public GroundTile voidTile;
 
 
@@ -53,6 +54,7 @@ public class ChunkManager : MonoBehaviour
 			Instance = this;
 		else
 			Destroy(gameObject);
+		Utilities.CHUNK_SIZE = CHUNK_SIZE;
 	}
 
 	private void Start()
@@ -62,6 +64,7 @@ public class ChunkManager : MonoBehaviour
 		pathTile1 = Resources.Load<GroundTile>("Tiles/Path_01");
 		pathTile2 = Resources.Load<GroundTile>("Tiles/Path_02");
 		pathTile3 = Resources.Load<GroundTile>("Tiles/Path_03");
+		pathTile4 = Resources.Load<GroundTile>("Tiles/Path_04");
 		voidTile = Resources.Load<GroundTile>("Tiles/Void");
 	}
 
@@ -142,25 +145,6 @@ public class ChunkManager : MonoBehaviour
 		if (_loadedChunks.ContainsKey(chunkPos))
 			return _loadedChunks[chunkPos];
 		return null;
-	}
-
-	public static Vector3Int ChunkToWorld(Vector2Int chunkPos)
-	{
-		return new(chunkPos.x * CHUNK_SIZE, chunkPos.y * CHUNK_SIZE);
-	}
-
-	public static Vector2Int FloorPosition(Vector3 position)
-	{
-		return new(
-			Mathf.FloorToInt(position.x),
-			Mathf.FloorToInt(position.y));
-	}
-
-	public static Vector2Int PosToChunk(Vector2 position)
-	{
-		return new(
-			Mathf.FloorToInt(position.x / CHUNK_SIZE),
-			Mathf.FloorToInt(position.y / CHUNK_SIZE));
 	}
 
 	private void LoadChunk(Vector2Int chunkPos)

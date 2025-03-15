@@ -7,6 +7,8 @@ using UnityEngine.Tilemaps;
 public class GroundTile : RuleTile<GroundTile.Neighbor>
 {
 	public bool walkable = true;
+	
+	[Tooltip("HIGHER is LESS likely to be walked on\nLOWER is MORE likely to be walked on")] public int penalty = 0;
 
 	public class Neighbor : RuleTile.TilingRule.Neighbor
 	{

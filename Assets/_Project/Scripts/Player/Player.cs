@@ -6,7 +6,7 @@ public class Player : MonoBehaviour
 	public static Player Instance { get; private set; }
 
 	[SerializeField] float moveSpeed = 10f;
-	[SerializeField] Transform predator;
+	[SerializeField] Transform[] predators;
 
 	Vector2 _velocity;
 
@@ -43,27 +43,29 @@ public class Player : MonoBehaviour
 
 		rb.linearVelocity = _velocity;
 
-		RequestPath();
+		//RequestPath();
 	}
 
-	async void RequestPath()
-	{
-		Vector2Int startPos = ChunkManager.FloorPosition(predator.position);
-		Vector2Int targetPos = ChunkManager.FloorPosition(transform.position);
-		//Debug.Log($"Start: {startPos}, Target: {targetPos}");
+	//async void RequestPath()
+	//{
+	//	List<Vector2Int>[] paths = new List<Vector2Int>[predators.Length];
 
-		List<Vector2Int> path = await Pathfinding.FindPathAsync(startPos, targetPos);
+	//	for (int i = 0; i < predators.Length; i++)
+	//	{
+	//		paths[i] = await Pathfinding.FindPathAsync(predators[i].position, transform.position);
+	//		if (paths[i] != null)
+	//		{
+	//			for (int j = 0; j < paths[i].Count - 1; j++)
+	//			{
+	//				Debug.DrawLine(paths[i][j] + new Vector2(0.5f, 0.5f), paths[i][j + 1] + new Vector2(0.5f, 0.5f), Color.red, 0.1f, false);
+	//			}
+	//		}
+	//		else
+	//		{
+	//			Debug.Log("Path not found !");
+	//		}
+	//	}
 
-		if (path != null)
-		{
-			for (int i = 0; i < path.Count - 1; i++)
-			{
-				Debug.DrawLine(path[i] + new Vector2(0.5f, 0.5f), path[i + 1] + new Vector2(0.5f, 0.5f), Color.red, 0f, false);
-			}
-		}
-		else
-		{
-			Debug.Log("Path not found !");
-		}
-	}
+
+	//}
 }

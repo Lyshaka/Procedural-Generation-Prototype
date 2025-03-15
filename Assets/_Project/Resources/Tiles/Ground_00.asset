@@ -17,3 +17,4 @@ MonoBehaviour:
   m_DefaultColliderType: 0
   m_TilingRules: []
   walkable: 1
+  penalty: -100

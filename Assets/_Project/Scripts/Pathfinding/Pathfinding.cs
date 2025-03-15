@@ -8,30 +8,11 @@ public class Pathfinding : MonoBehaviour
 	const int STRAIGHT_COST = 100;
 	const int DIAGONAL_COST = 145;
 
-	PathRequestManager _pathRequestManager;
-
-	private void Awake()
-	{
-		_pathRequestManager = GetComponent<PathRequestManager>();
-	}
-
-	public void StartFindPath(Vector2Int pathStart, Vector2Int pathTarget)
-	{
-		StartCoroutine(FindPath(pathStart, pathTarget));
-	}
-
-	public IEnumerator FindPath(Vector3 startPos, Vector3 targetPos)
-	{
-		yield return StartCoroutine(FindPath(
-			Utilities.FloorPosition(startPos),
-			Utilities.FloorPosition(targetPos)));
-	}
-
-	public IEnumerator FindPath(Vector2Int startPos, Vector2Int targetPos)
+	public void FindPath(PathRequest request, Action<PathResult> callback)
 	{
 		// Get the chunk the positions are in
-		Vector2Int startChunk = Utilities.PosToChunk(startPos);
-		Vector2Int targetChunk = Utilities.PosToChunk(targetPos);
+		Vector2Int startChunk = Utilities.PosToChunk(request.pathStart);
+		Vector2Int targetChunk = Utilities.PosToChunk(request.pathTarget);
 
 		// Extend chunk range to 1 in each direction to cover a bigger area
 		int minX = Mathf.Min(startChunk.x, targetChunk.x) - 1;
@@ -60,8 +41,8 @@ public class Pathfinding : MonoBehaviour
 				ChunkObject chunk = ChunkManager.Instance.GetChunk(offsetStartChunk + new Vector2Int(cx, cy));
 				if (chunk == null)
 				{
-					_pathRequestManager.FinishedProcessingPath(null, false);
-					yield break; // Chunk isn't loaded, abort pathfinding
+					callback(new PathResult(null, false, request.callback));
+					return; // Chunk isn't loaded, abort pathfinding
 				}
 
 				// Browsing each tile (tx, ty) in the chunk (cx, cy)
@@ -84,8 +65,8 @@ public class Pathfinding : MonoBehaviour
 		}
 
 		// Convert world position to local grid position
-		Vector2Int startLocalPos = startPos - (Vector2Int)Utilities.ChunkToWorld(offsetStartChunk);
-		Vector2Int targetLocalPos = targetPos - (Vector2Int)Utilities.ChunkToWorld(offsetStartChunk);
+		Vector2Int startLocalPos = request.pathStart - (Vector2Int)Utilities.ChunkToWorld(offsetStartChunk);
+		Vector2Int targetLocalPos = request.pathTarget - (Vector2Int)Utilities.ChunkToWorld(offsetStartChunk);
 
 		Vector2Int[] waypoints = new Vector2Int[0];
 		bool pathSuccess = false;
@@ -133,12 +114,15 @@ public class Pathfinding : MonoBehaviour
 				}
 			}
 		}
-		yield return null;
 
 		if (pathSuccess)
+		{ 
 			waypoints = RetracePath(startNode, targetNode);
-		_pathRequestManager.FinishedProcessingPath(waypoints, pathSuccess);
-
+			pathSuccess = waypoints.Length > 0;
+		}
+		
+		callback(new PathResult(waypoints, pathSuccess, request.callback));
+		return;
 
 		// Utilities
 		List<Node> GetNeighbors(Node node)

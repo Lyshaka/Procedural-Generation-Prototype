@@ -5,11 +5,11 @@ public class Unit : MonoBehaviour
 {
 	public Transform target;
 	public float speed = 20f;
-	Vector2Int[] path;
+	public Vector2Int[] path;
 	int targetIndex;
 
 	int counter = 0;
-	int counterMax = 10;
+	int counterMax = 5;
 
 	private void Start()
 	{
@@ -49,8 +49,6 @@ public class Unit : MonoBehaviour
 			path = newPath;
 			StartCoroutine(FollowPath());
 		}
-		else
-			Debug.Log("Nope");
 	}
 
 	IEnumerator FollowPath()
@@ -71,7 +69,6 @@ public class Unit : MonoBehaviour
 				targetIndex++;
 				if (path == null || targetIndex >= path.Length)
 				{
-					RequestNewPath();
 					yield break;
 				}
 				currentWaypoint = path[targetIndex];
@@ -81,21 +78,21 @@ public class Unit : MonoBehaviour
 		}
 	}
 
-	private void OnDrawGizmos()
-	{
-		if (path != null)
-		{
-			for (int i = targetIndex; i < path.Length; i++)
-			{
-				Gizmos.color = Color.blue;
-				Gizmos.DrawCube(Utilities.PosToWorld(path[i]), Vector3.one / 3f);
+	//private void OnDrawGizmos()
+	//{
+	//	if (path != null)
+	//	{
+	//		for (int i = targetIndex; i < path.Length; i++)
+	//		{
+	//			Gizmos.color = Color.blue;
+	//			Gizmos.DrawCube(Utilities.PosToWorld(path[i]), Vector3.one / 3f);
 
-				if (i == targetIndex)
-					Gizmos.DrawLine(transform.position, Utilities.PosToWorld(path[i]));
-				else
-					Gizmos.DrawLine(Utilities.PosToWorld(path[i - 1]), Utilities.PosToWorld(path[i]));
+	//			if (i == targetIndex)
+	//				Gizmos.DrawLine(transform.position, Utilities.PosToWorld(path[i]));
+	//			else
+	//				Gizmos.DrawLine(Utilities.PosToWorld(path[i - 1]), Utilities.PosToWorld(path[i]));
 
-			}
-		}
-	}
+	//		}
+	//	}
+	//}
 }

@@ -1,0 +1,77 @@
+#pragma kernel CSMain
+
+RWTexture2D<float4> Result; // Output texture
+int Width;
+int Height;
+float Scale;
+float Threshold;
+float Seed;
+
+//#include "UnityCG.cginc"
+
+float rand(float2 p, float seed = 0)
+{
+	return frac(sin(dot(p + seed, float2(12.9898, 78.233))) * 43758.5453);
+}
+
+float threshold(float a)
+{
+	if (a > Threshold)
+		return ceil(a);
+	return floor(a);
+}
+
+float perlinNoise(float2 uv, float seed, int octaves, float persistence)
+{
+	float2 p = floor(uv); // Grid coordinates
+	float2 f = frac(uv); // Fractional part of the coordinates
+	f = f * f * (3.0 - 2.0 * f); // Smooth interpolation
+
+	// Adding multiple octaves of noise at different scales
+	float amplitude = 1.0;
+	float frequency = 1.0;
+	float noiseValue = 0.0;
+
+	for (int i = 0; i < octaves; ++i)
+	{
+		// Introduce a random seed for each octave to prevent grid artifacts
+		float octaveSeed = seed + (float) i * 1000.0;
+		
+		// Generate random values at the grid corners
+		float a = rand(p, octaveSeed);
+		float b = rand(p + float2(1.0, 0.0), octaveSeed);
+		float c = rand(p + float2(0.0, 1.0), octaveSeed);
+		float d = rand(p + float2(1.0, 1.0), octaveSeed);
+
+		// Interpolate between the random corners
+		float octaveNoise = lerp(lerp(a, b, f.x), lerp(c, d, f.x), f.y);
+		
+		// Accumulate the noise value with amplitude scaling and frequency scaling
+		noiseValue += octaveNoise * amplitude;
+
+		// Increase frequency, decrease amplitude
+		frequency *= 2.0;
+		amplitude *= persistence;
+
+		// Move to the next layer
+		p *= 2.0;
+		f *= 2.0;
+	}
+
+	return noiseValue * 0.5 + 0.5;
+}
+
+[numthreads(8, 8, 1)]
+void CSMain(uint3 id : SV_DispatchThreadID)
+{
+	if (id.x >= (uint) Width || id.y >= (uint) Height)
+		return;
+
+	float2 uv = float2(id.x, id.y) / float2(Width, Height) * Scale;
+	
+	uv += Seed;
+	
+	float noiseValue = threshold(perlinNoise(uv, Seed, 4, 0.5));
+
+	Result[id.xy] = float4(noiseValue, noiseValue, noiseValue, 1);
+}
